@@ -25,10 +25,10 @@ server.post("/", validateAccount, (req, res) => {
   const newAccount = { name: req.name, budget: req.budget };
 
   db("accounts")
-    .insert(newAccount, "id")
-    .then(async id => {
+    .insert(newAccount)
+    .then(async ([id]) => {
       const account = await db("accounts")
-        .where({ id: id[0] })
+        .where({ id })
         .first();
 
       res.status(200).json(account);
@@ -46,7 +46,7 @@ server.put("/:id", validateAccountId, validateAccount, (req, res) => {
 
   db("accounts")
     .where({ id })
-    .update(changes, "id")
+    .update(changes)
     .then(async () => {
       const account = await db("accounts")
         .where({ id })
