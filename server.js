@@ -8,11 +8,39 @@ server.use(express.json());
 
 // GET all accounts
 server.get("/", async (req, res) => {
-  const accounts = await db("accounts");
+  const { limit, sortby, sortdir } = req.query;
 
-  accounts
-    ? res.status(200).json(accounts)
-    : res.status(500).json("Error", err);
+  if (limit && !sortby) {
+    try {
+      const accounts = await db("accounts").limit(limit);
+      res.status(200).json(accounts);
+    } catch (err) {
+      res.status(500).json("Error", err);
+    }
+  } else if (!limit && sortby) {
+    try {
+      const accounts = await db("accounts").orderBy(sortby, sortdir);
+      res.status(200).json(accounts);
+    } catch (err) {
+      res.status(500).json("Error", err);
+    }
+  } else if (limit && sortby) {
+    try {
+      const accounts = await db("accounts")
+        .orderBy(sortby, sortdir)
+        .limit(limit);
+      res.status(200).json(accounts);
+    } catch (err) {
+      res.status(500).json("Error", err);
+    }
+  } else {
+    try {
+      const accounts = await db("accounts");
+      res.status(200).json(accounts);
+    } catch (err) {
+      res.status(500).json("Error", err);
+    }
+  }
 });
 
 // GET account by ID
